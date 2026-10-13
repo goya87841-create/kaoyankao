@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f5fa">
+  <title>10月打卡 · 考研起跑</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #554e5e;
+      --muted: #958d9c;
+      --pink: #d8b9ca;
+      --pink-deep: #ab819c;
+      --pink-pale: #f7eef4;
+      --lavender: #c8c3db;
+      --sage: #bdc9be;
+      --paper: rgba(255, 255, 255, .88);
+      --line: #eee8ef;
+      --shadow: 0 12px 36px rgba(100, 79, 103, .07);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 12% 0%, rgba(234, 216, 231, .45), transparent 40%),
+        radial-gradient(ellipse at 94% 44%, rgba(215, 221, 231, .35), transparent 36%),
+        #fbf9fc;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      position: fixed;
+      z-index: 0;
+      pointer-events: none;
+      inset: 0;
+      background-image: radial-gradient(rgba(176, 150, 177, .13) .8px, transparent .8px);
+      background-size: 17px 17px;
+      content: "";
+    }
+
+    button { font: inherit; }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(100% - 32px, 620px);
+      margin: 0 auto;
+      padding: 38px 0 32px;
+    }
+
+    .hero {
+      padding: 25px 8px 27px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 12px;
+      padding: 5px 12px;
+      border: 1px solid rgba(186, 158, 184, .22);
+      border-radius: 99px;
+      background: rgba(255, 255, 255, .55);
+      color: var(--pink-deep);
+      font-size: 11px;
+      letter-spacing: 2px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      color: #5e5364;
+      font-size: clamp(27px, 7vw, 36px);
+      font-weight: 650;
+      letter-spacing: 1px;
+      line-height: 1.35;
+    }
+
+    .hero p {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+
+    .card {
+      margin-top: 16px;
+      padding: 21px 22px;
+      border: 1px solid rgba(233, 225, 235, .88);
+      border-radius: 21px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      color: #62586a;
+      font-size: 16px;
+      font-weight: 650;
+      letter-spacing: .4px;
+    }
+
+    .section-note, .month-label {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .selected-date {
+      margin: -7px 0 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .selected-date strong { color: var(--pink-deep); font-weight: 600; }
+
+    .date-picker {
+    padding: 3px 21px 3px 7px;
+    border: 1px solid #eee5ef;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--pink-deep);
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    }
+
+    .task-list { display: grid; gap: 9px; }
+
+    .task-row {
+      display: flex;
+      min-height: 59px;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid #f0ebf1;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .76);
+      transition: background .18s, border-color .18s, opacity .18s;
+    }
+
+    .task-row.is-done {
+      border-color: #eee7ee;
+      background: #f8f6f8;
+    }
+
+    .task-toggle {
+      display: grid;
+      width: 25px;
+      height: 25px;
+      flex: 0 0 25px;
+      place-items: center;
+      padding: 0;
+      border: 1.5px solid #d9cfdd;
+      border-radius: 50%;
+      background: #fff;
+      color: #fff;
+      cursor: pointer;
+      transition: background .18s, border-color .18s, transform .15s;
+    }
+
+    .task-toggle:hover { transform: scale(1.06); }
+    .task-toggle[aria-pressed="true"] { border-color: var(--pink-deep); background: var(--pink-deep); }
+    .task-toggle svg { width: 13px; height: 13px; }
+
+    .task-copy {
+      display: flex;
+      min-width: 0;
+      flex: 1;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .task-name {
+      overflow-wrap: anywhere;
+      color: #655c6d;
+      font-size: 14px;
+      transition: color .18s;
+    }
+
+    .task-time {
+      flex: 0 0 auto;
+      color: #a49ca8;
+      font-size: 11px;
+    }
+
+    .task-row.is-done .task-name {
+      color: #aaa3ad;
+      text-decoration: line-through;
+      text-decoration-color: #c3bac6;
+    }
+
+    .task-row.is-done .task-time { color: #bdb6c0; }
+
+    .remove-task {
+      width: 28px;
+      height: 28px;
+      flex: 0 0 28px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #b4aab6;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .remove-task:hover { background: var(--pink-pale); color: var(--pink-deep); }
+
+    .add-task {
+      display: flex;
+      width: 100%;
+      min-height: 45px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 11px;
+      border: 1px dashed #d9cddb;
+      border-radius: 13px;
+      background: rgba(250, 247, 251, .6);
+      color: #9d8ba1;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background .18s, border-color .18s;
+    }
+
+    .add-task:hover { border-color: var(--pink); background: var(--pink-pale); }
+    .add-task span:first-child { font-size: 19px; line-height: 1; }
+
+    .calendar-card { padding-bottom: 20px; }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .weekday {
+      padding: 1px 0 4px;
+      color: #aaa1af;
+      font-size: 10px;
+      text-align: center;
+    }
+
+    .calendar-blank { aspect-ratio: 1; }
+
+    .day-button {
+      position: relative;
+      display: flex;
+      min-width: 0;
+      aspect-ratio: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      padding: 2px;
+      border: 1px solid #f0eaf1;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .8);
+      color: #726a78;
+      cursor: pointer;
+      transition: transform .14s, background .16s, border-color .16s;
+    }
+
+    .day-button:hover { transform: translateY(-1px); border-color: #d9c9da; }
+    .day-number { font-size: 12px; line-height: 1.2; }
+    .day-status { min-height: 12px; color: #aaa0ad; font-size: 9px; line-height: 1.2; }
+
+    .day-button.is-selected {
+      border: 1.5px solid var(--pink-deep);
+      box-shadow: 0 0 0 2px rgba(171, 129, 156, .09);
+    }
+
+    .day-button.is-checked {
+      border-color: #c8d6ca;
+      background: #eef4ef;
+      color: #708774;
+    }
+
+    .day-button.is-checked .day-status { color: #708774; }
+    .day-button.is-today .day-number { color: var(--pink-deep); font-weight: 700; }
+    .day-button.is-selected.is-checked { border-color: #b4c8b7; }
+    .calendar-legend { margin: 11px 0 0; color: #a39aa7; font-size: 10px; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+    }
+
+    .stat {
+      min-height: 91px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      padding: 9px 5px;
+      border-radius: 15px;
+      background: #f8f4f8;
+      text-align: center;
+    }
+
+    .stat:nth-child(2) { background: #f5f4f9; }
+    .stat:nth-child(3) { background: #f2f6f2; }
+
+    .stat-number {
+      color: #806b84;
+      font-size: 25px;
+      font-weight: 650;
+      line-height: 1.25;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat:nth-child(3) .stat-number { color: #748b78; }
+    .stat-label { color: #948b9a; font-size: 10px; }
+    .stat-caption { margin: 10px 0 0; color: #aaa1ad; font-size: 10px; text-align: center; }
+
+    .storage-message {
+      margin: 11px 0 0;
+      color: #a34655;
+      font-size: 11px;
+      overflow-wrap: anywhere;
+    }
+
+    .storage-message:empty { display: none; }
+
+    .footer {
+      padding: 26px 8px 4px;
+      color: #8d8091;
+      text-align: center;
+    }
+
+    .encouragement {
+      min-height: 27px;
+      margin: 0 0 8px;
+      font-size: 13px;
+      letter-spacing: .4px;
+    }
+
+    .quote-button {
+      padding: 5px 10px;
+      border: 0;
+      border-radius: 99px;
+      background: transparent;
+      color: #a79baa;
+      cursor: pointer;
+      font-size: 10px;
+    }
+
+    .quote-button:hover { background: rgba(255, 255, 255, .6); color: var(--pink-deep); }
+
+    @media (max-width: 420px) {
+      .page { width: min(100% - 24px, 620px); padding-top: 22px; }
+      .hero { padding-top: 18px; padding-bottom: 22px; }
+      .card { padding: 18px 15px; }
+      .calendar-grid { gap: 5px; }
+      .day-button { border-radius: 10px; }
+      .task-copy { flex-direction: column; align-items: flex-start; gap: 0; }
+      .stats-grid { gap: 6px; }
+      .stat-label { font-size: 9px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div class="eyebrow">✿ &nbsp; 2027 考研 · 苏州大学</div>
+      <h1>10月打卡 · 考研起跑</h1>
+      <p>先跑起来，别追求完美</p>
+    </header>
+
+    <section class="card" aria-labelledby="tasks-title">
+      <div class="section-heading">
+        <h2 id="tasks-title">每日三件事</h2>
+        <span class="section-note">完成一点，也算向前</span>
+      </div>
+      <p class="selected-date">正在记录：
+        <select id="date-picker" class="date-picker" aria-label="选择要记录任务的日期"></select>
+      </p>
+      <div id="task-list" class="task-list"></div>
+      <button id="add-task" class="add-task" type="button"><span aria-hidden="true">＋</span><span>添加一件自己的小事</span></button>
+    </section>
+
+    <section class="card calendar-card" aria-labelledby="calendar-title">
+      <div class="section-heading">
+        <h2 id="calendar-title">本月日历打卡</h2>
+        <span class="month-label">2026 年 · 10 月</span>
+      </div>
+      <div id="calendar" class="calendar-grid" role="group" aria-label="2026年10月13日至31日学习打卡日历"></div>
+      <p class="calendar-legend">用日期选择当天任务；点日历方块，记录或取消这天学了。</p>
+    </section>
+
+    <section class="card" aria-labelledby="stats-title">
+      <div class="section-heading">
+        <h2 id="stats-title">一点点，也有进度</h2>
+        <span class="section-note">你的十月足迹</span>
+      </div>
+      <div class="stats-grid" aria-live="polite">
+        <div class="stat">
+          <span id="checked-days" class="stat-number">0</span>
+          <span class="stat-label">已打卡天数</span>
+        </div>
+        <div class="stat">
+          <span id="checkin-streak" class="stat-number">0</span>
+          <span class="stat-label">连续打卡天数</span>
+        </div>
+        <div class="stat">
+          <span id="word-streak" class="stat-number">0</span>
+          <span class="stat-label">单词连续天数</span>
+        </div>
+      </div>
+      <p class="stat-caption">连续天数从最近一次打卡往前计算</p>
+      <p id="storage-message" class="storage-message" role="status" aria-live="polite"></p>
+    </section>
+
+    <footer class="footer">
+      <p id="encouragement" class="encouragement"></p>
+      <button id="change-quote" class="quote-button" type="button">换一句鼓励的话 ↗</button>
+    </footer>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "october-study-checkin-2026";
+      const YEAR = 2026;
+      const MONTH_INDEX = 9;
+      const FIRST_DAY = 13;
+      const LAST_DAY = 31;
+      const BASE_TASKS = [
+        { id: "words", label: "背单词", time: "30-60 分钟" },
+        { id: "math", label: "数学", time: "2 小时" },
+        { id: "reflection", label: "睡前反思", time: "10 分钟" }
+      ];
+      const QUOTES = [
+        "慢慢来，持续就很了不起。",
+        "今天的你，已经比昨天更靠近目标。",
+        "不必每天满分，只要愿意继续。",
+        "先跑起来，答案会在路上慢慢清晰。",
+        "认真生活，也认真走向想去的地方。",
+        "每一次翻开书，都是一次小小的出发。"
+      ];
+      const WEEKDAYS = ["一", "二", "三", "四", "五", "六", "日"];
+      const taskList = document.getElementById("task-list");
+      const calendar = document.getElementById("calendar");
+      const datePicker = document.getElementById("date-picker");
+      const storageMessage = document.getElementById("storage-message");
+
+      function dateKey(day) {
+        return YEAR + "-10-" + String(day).padStart(2, "0");
+      }
+
+      function initialSelectedDate() {
+        const now = new Date();
+        if (now.getFullYear() === YEAR && now.getMonth() === MONTH_INDEX &&
+            now.getDate() >= FIRST_DAY && now.getDate() <= LAST_DAY) {
+          return dateKey(now.getDate());
+        }
+        return dateKey(FIRST_DAY);
+      }
+
+      function emptyState() {
+        return {
+          version: 1,
+          selectedDate: initialSelectedDate(),
+          checkins: [],
+          tasks: BASE_TASKS.map(task => ({ ...task })),
+          checks: {}
+        };
+      }
+
+      function isValidDateKey(value) {
+        if (typeof value !== "string" || !/^2026-10-(1[3-9]|2\d|3[01])$/.test(value)) return false;
+        return true;
+      }
+
+      function loadState() {
+        const defaults = emptyState();
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (saved === null) return defaults;
+          const parsed = JSON.parse(saved);
+          if (!parsed || parsed.version !== 1 || !Array.isArray(parsed.tasks) ||
+              !Array.isArray(parsed.checkins) || !parsed.checks || typeof parsed.checks !== "object") {
+            throw new Error("保存的数据格式不正确。");
+          }
+
+          const tasks = parsed.tasks.filter(task =>
+            task && typeof task.id === "string" && typeof task.label === "string" &&
+            task.label.trim() && typeof task.time === "string"
+          );
+          const hasBaseTasks = BASE_TASKS.every(base => tasks.some(task => task.id === base.id));
+          if (!hasBaseTasks) throw new Error("保存的打卡事项不完整。");
+
+          const checks = {};
+          for (const [key, dayChecks] of Object.entries(parsed.checks)) {
+            if (!isValidDateKey(key) || !dayChecks || typeof dayChecks !== "object") continue;
+            checks[key] = {};
+            for (const [id, checked] of Object.entries(dayChecks)) {
+              if (checked === true) checks[key][id] = true;
+            }
+          }
+
+          return {
+            version: 1,
+            selectedDate: isValidDateKey(parsed.selectedDate) ? parsed.selectedDate : defaults.selectedDate,
+            checkins: [...new Set(parsed.checkins.filter(isValidDateKey))],
+            tasks,
+            checks
+          };
+        } catch (error) {
+          storageMessage.textContent = "无法读取已保存的打卡数据：" + error.message + " 当前使用空白记录。";
+          return defaults;
+        }
+      }
+
+      let state = loadState();
+
+      function initializeDatePicker() {
+        for (let day = FIRST_DAY; day <= LAST_DAY; day++) {
+          const option = document.createElement("option");
+          const key = dateKey(day);
+          option.value = key;
+          option.textContent = formatDate(key);
+          datePicker.append(option);
+        }
+        datePicker.value = state.selectedDate;
+        datePicker.addEventListener("change", () => {
+          state.selectedDate = datePicker.value;
+          saveState();
+          render();
+        });
+      }
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          storageMessage.textContent = "";
+        } catch (error) {
+          storageMessage.textContent = "保存失败，请检查浏览器存储空间或隐私设置：" + error.message;
+        }
+      }
+
+      function formatDate(key) {
+        const day = Number(key.slice(-2));
+        const weekday = new Date(YEAR, MONTH_INDEX, day).getDay();
+        const weekdayName = ["日", "一", "二", "三", "四", "五", "六"][weekday];
+        return "10 月 " + day + " 日（周" + weekdayName + "）";
+      }
+
+      function renderTasks() {
+        datePicker.value = state.selectedDate;
+        taskList.replaceChildren();
+
+        for (const task of state.tasks) {
+          const done = state.checks[state.selectedDate]?.[task.id] === true;
+          const row = document.createElement("div");
+          row.className = "task-row" + (done ? " is-done" : "");
+
+          const toggle = document.createElement("button");
+          toggle.type = "button";
+          toggle.className = "task-toggle";
+          toggle.setAttribute("aria-pressed", String(done));
+          toggle.setAttribute("aria-label", (done ? "取消完成：" : "标记完成：") + task.label);
+          toggle.innerHTML = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m3.5 8 3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+          toggle.addEventListener("click", () => {
+            if (!state.checks[state.selectedDate]) state.checks[state.selectedDate] = {};
+            if (state.checks[state.selectedDate][task.id]) {
+              delete state.checks[state.selectedDate][task.id];
+            } else {
+              state.checks[state.selectedDate][task.id] = true;
+            }
+            saveState();
+            render();
+          });
+
+          const copy = document.createElement("div");
+          copy.className = "task-copy";
+          const name = document.createElement("span");
+          name.className = "task-name";
+          name.textContent = task.label;
+          const time = document.createElement("span");
+          time.className = "task-time";
+          time.textContent = task.time;
+          copy.append(name, time);
+          row.append(toggle, copy);
+
+          if (!BASE_TASKS.some(base => base.id === task.id)) {
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.className = "remove-task";
+            remove.textContent = "×";
+            remove.setAttribute("aria-label", "删除事项：" + task.label);
+            remove.addEventListener("click", () => {
+              state.tasks = state.tasks.filter(item => item.id !== task.id);
+              for (const dayChecks of Object.values(state.checks)) delete dayChecks[task.id];
+              saveState();
+              render();
+            });
+            row.append(remove);
+          }
+
+          taskList.append(row);
+        }
+      }
+
+      function renderCalendar() {
+        calendar.replaceChildren();
+        for (const weekday of WEEKDAYS) {
+          const heading = document.createElement("span");
+          heading.className = "weekday";
+          heading.textContent = weekday;
+          calendar.append(heading);
+        }
+
+        const firstWeekday = (new Date(YEAR, MONTH_INDEX, FIRST_DAY).getDay() + 6) % 7;
+        for (let i = 0; i < firstWeekday; i++) {
+          const blank = document.createElement("span");
+          blank.className = "calendar-blank";
+          blank.setAttribute("aria-hidden", "true");
+          calendar.append(blank);
+        }
+
+        const today = new Date();
+        for (let day = FIRST_DAY; day <= LAST_DAY; day++) {
+          const key = dateKey(day);
+          const checked = state.checkins.includes(key);
+          const isSelected = state.selectedDate === key;
+          const isToday = today.getFullYear() === YEAR && today.getMonth() === MONTH_INDEX && today.getDate() === day;
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "day-button" +
+            (checked ? " is-checked" : "") +
+            (isSelected ? " is-selected" : "") +
+            (isToday ? " is-today" : "");
+          button.setAttribute("aria-pressed", String(checked));
+          button.setAttribute("aria-current", isToday ? "date" : "false");
+          button.setAttribute("aria-label", "10月" + day + "日，" + (checked ? "已打卡" : "未打卡") +
+            (isSelected ? "，当前查看" : "") + "。点击" + (checked ? "取消打卡" : "标记已学习"));
+
+          const number = document.createElement("span");
+          number.className = "day-number";
+          number.textContent = String(day);
+          const status = document.createElement("span");
+          status.className = "day-status";
+          status.textContent = checked ? "✓ 学了" : isToday ? "今天" : "";
+          button.append(number, status);
+
+          button.addEventListener("click", () => {
+            if (state.checkins.includes(key)) {
+              state.checkins = state.checkins.filter(item => item !== key);
+            } else {
+              state.checkins.push(key);
+            }
+            state.selectedDate = key;
+            saveState();
+            render();
+          });
+          calendar.append(button);
+        }
+      }
+
+      function consecutiveDays(dates) {
+        if (dates.size === 0) return 0;
+        const sorted = [...dates].sort();
+        let streak = 0;
+        const last = new Date(sorted[sorted.length - 1] + "T00:00:00");
+        for (;;) {
+          const key = last.getFullYear() + "-10-" + String(last.getDate()).padStart(2, "0");
+          if (!dates.has(key)) break;
+          streak++;
+          last.setDate(last.getDate() - 1);
+        }
+        return streak;
+      }
+
+      function renderStats() {
+        const checkinDates = new Set(state.checkins);
+        const wordDates = new Set(
+          Object.entries(state.checks)
+            .filter(([, checks]) => checks.words === true)
+            .map(([key]) => key)
+        );
+        document.getElementById("checked-days").textContent = String(checkinDates.size);
+        document.getElementById("checkin-streak").textContent = String(consecutiveDays(checkinDates));
+        document.getElementById("word-streak").textContent = String(consecutiveDays(wordDates));
+      }
+
+      function render() {
+        renderTasks();
+        renderCalendar();
+        renderStats();
+      }
+
+      document.getElementById("add-task").addEventListener("click", () => {
+        const label = window.prompt("想给自己加一件什么小事？");
+        if (label === null) return;
+        const trimmed = label.trim();
+        if (!trimmed) {
+          window.alert("事项名称不能为空哦。");
+          return;
+        }
+        const time = window.prompt("大约花多久？（可留空）", "");
+        if (time === null) return;
+        state.tasks.push({
+          id: "custom-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8),
+          label: trimmed,
+          time: time.trim()
+        });
+        saveState();
+        render();
+      });
+
+      document.getElementById("change-quote").addEventListener("click", () => {
+        const quote = document.getElementById("encouragement");
+        const choices = QUOTES.filter(item => item !== quote.textContent);
+        quote.textContent = choices[Math.floor(Math.random() * choices.length)];
+      });
+
+      document.getElementById("encouragement").textContent =
+        QUOTES[Math.floor(Math.random() * QUOTES.length)];
+      initializeDatePicker();
+      render();
+    })();
+  </script>
+</body>
+</html>
